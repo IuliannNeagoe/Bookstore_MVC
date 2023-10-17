@@ -1,6 +1,7 @@
 ﻿using Bookstore.DataAccess.Repositories.Interfaces;
 using Bookstore.Models.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BookstoreWeb.Areas.Customer.Controllers
 {
@@ -25,6 +26,19 @@ namespace BookstoreWeb.Areas.Customer.Controllers
         #region Create
         public IActionResult Create()
         {
+            //obtain the Categories to pass onto the dropdown
+
+            var categoriesFromDb = _unitOfWork.CategoryRepository.GetAll();
+
+            IEnumerable<SelectListItem> categoryList = categoriesFromDb.Select(
+                c => new SelectListItem()
+                    {
+                        Text = c.Name,
+                        Value = c.Id.ToString()
+                    });
+
+            //make it accessible from the view
+            ViewBag.CategoryList = categoryList;
             return View();
         }
 
