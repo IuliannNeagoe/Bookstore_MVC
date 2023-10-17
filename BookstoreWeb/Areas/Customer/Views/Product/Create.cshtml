@@ -6,7 +6,7 @@
     </div>
 
     <div class="card-body">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             <div class="form-floating py-2">
                 <input asp-for="Product.Title" class="form-control border-0 shadow" />
                 <label asp-for="Product.Title"></label>
@@ -63,6 +63,11 @@
                 <input asp-for="Product.Price100" class="form-control border-0 shadow" />
                 <label asp-for="Product.Price100"></label>
                 <span asp-validation-for="Product.Price100" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating py-2">
+                <input type="file" asp-for="Product.ImageUrl" class="form-control border-0 shadow" />
+                <label asp-for="Product.ImageUrl"></label>
             </div>
 
             <div class="row py-2 d-flex justify-content-center">
