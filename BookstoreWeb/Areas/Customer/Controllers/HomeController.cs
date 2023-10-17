@@ -1,9 +1,10 @@
-using BookstoreWeb.Models;
+using Bookstore.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace BookstoreWeb.Controllers
+namespace BookstoreWeb.Areas.Customer.Controllers
 {
+    [Area("Customer")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
