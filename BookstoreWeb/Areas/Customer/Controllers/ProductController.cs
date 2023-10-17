@@ -1,5 +1,6 @@
 ﻿using Bookstore.DataAccess.Repositories.Interfaces;
 using Bookstore.Models.Models;
+using Bookstore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -27,27 +28,40 @@ namespace BookstoreWeb.Areas.Customer.Controllers
         public IActionResult Create()
         {
             //obtain the Categories to pass onto the dropdown
-
             var categoriesFromDb = _unitOfWork.CategoryRepository.GetAll();
 
             IEnumerable<SelectListItem> categoryList = categoriesFromDb.Select(
                 c => new SelectListItem()
-                    {
-                        Text = c.Name,
-                        Value = c.Id.ToString()
-                    });
+                {
+                    Text = c.Name,
+                    Value = c.Id.ToString()
+                });
 
-            //make it accessible from the view
-            ViewBag.CategoryList = categoryList;
-            return View();
+
+            ProductViewModel productViewModel = new ProductViewModel();
+            productViewModel.Product = new Product();
+            productViewModel.CategoryList = categoryList;
+
+            return View(productViewModel);
         }
 
         [HttpPost]
-        public IActionResult Create(Product product)
+        public IActionResult Create(ProductViewModel productViewModel)
         {
-            if (!ModelState.IsValid) return View();
+            if (!ModelState.IsValid)
+            {
+                //we need to populate the CategoryList again
+                productViewModel.CategoryList = _unitOfWork.CategoryRepository.GetAll()
+                    .Select(c => new SelectListItem() 
+                    { 
+                        Text = c.Name, 
+                        Value=c.Id.ToString()
+                    });
 
-            _unitOfWork.ProductRepository.Add(product);
+                return View(productViewModel);
+            }
+
+            _unitOfWork.ProductRepository.Add(productViewModel.Product);
             _unitOfWork.Save();
             TempData["success"] = "Product created successfully!";
             return RedirectToAction("Index", "Product");
