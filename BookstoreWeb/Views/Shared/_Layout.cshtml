@@ -11,6 +11,30 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
 <body>
+
+    <style>
+        /* Style the scrollbar for the entire page */
+        body {
+            overflow: auto;
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: darkgray lightgray; /* Firefox */
+        }
+
+            /* Style the thumb and track of the scrollbar for WebKit-based browsers (e.g., Chrome, Safari) */
+            body::-webkit-scrollbar {
+                width: 12px;
+            }
+
+            body::-webkit-scrollbar-thumb {
+                background-color: darkgray;
+                border-radius: 6px;
+            }
+
+            body::-webkit-scrollbar-track {
+                background-color: lightgray;
+            }
+    </style>
+
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -49,7 +73,7 @@
             </div>
         </nav>
     </header>
-    <div class="container" style=" max-height: calc(100vh - 150px); overflow-y: auto;">
+    <div class="container" style=" max-height: calc(100vh - 150px);">
         <main role="main" class="pb-3">
             <partial name="_Notification" />
             @RenderBody()
