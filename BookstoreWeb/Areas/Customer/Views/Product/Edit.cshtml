@@ -1,31 +1,68 @@
 ﻿@model Product
 
 <div class="card border-0 shadow">
-    <div class="card-header bg-secondary bg-gradient ml-0 py-3 ">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
         <h2 class="text-center text-light">Edit product</h2>
     </div>
 
     <div class="card-body p-4">
         <form method="post">
             <div class="p-3">
-                <div class="form-floating border-0 shadow mb-3">
-                    <input asp-for="Description" hidden/>
-                    <input asp-for="ISBN" hidden/>
-                    <input asp-for="ListPrice" hidden/>
-                    <input asp-for="Price50" hidden/>
-                    <input asp-for="Price100" hidden/>
-                    <input asp-for="Id" hidden/>
-                    <input asp-for="Price" hidden/>
-                    <input asp-for="CategoryId" hidden/>
-                    <input asp-for="Title" class="form-control" />
+                <input asp-for="Description" hidden />
+                <input asp-for="ISBN" hidden />
+                <input asp-for="ListPrice" hidden />
+                <input asp-for="Price50" hidden />
+                <input asp-for="Price100" hidden />
+                <input asp-for="Id" hidden />
+                <input asp-for="Price" hidden />
+                <input asp-for="CategoryId" hidden />
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Title" class="form-control border-0 shadow" />
                     <label asp-for="Title"></label>
                     <span asp-validation-for="Title" class="text-danger"></span>
                 </div>
 
-                <div class="form-floating border-0 shadow">
-                    <input asp-for="Author" class="form-control" />
+                <div class="form-floating mb-3">
+                    <input asp-for="Author" class="form-control border-0 shadow" />
                     <label asp-for="Author"></label>
                     <span asp-validation-for="Author" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <textarea asp-for="Description" class="form-control border-0 shadow"></textarea>
+                    <label asp-for="Description"></label>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="ISBN" class="form-control border-0 shadow" />
+                    <label asp-for="ISBN"></label>
+                    <span asp-validation-for="ISBN" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Price" class="form-control border-0 shadow" />
+                    <label asp-for="Price"></label>
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="ListPrice" class="form-control border-0 shadow" />
+                    <label asp-for="ListPrice"></label>
+                    <span asp-validation-for="ListPrice" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Price50" class="form-control border-0 shadow" />
+                    <label asp-for="Price50"></label>
+                    <span asp-validation-for="Price50" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Price100" class="form-control border-0 shadow" />
+                    <label asp-for="Price100"></label>
+                    <span asp-validation-for="Price100" class="text-danger"></span>
                 </div>
 
                 <div class="row py-2">
