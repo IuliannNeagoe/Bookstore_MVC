@@ -1,12 +1,13 @@
 ﻿@model ProductViewModel
 
-<div class="card border-0 shadow position-relative">
+<div class="card border-0 shadow overflow-y-auto">
     <div class="card-header text-center text-light bg-secondary bg-gradient">
-        <h2>Create product</h2>
+        <h2>@(Model.Product.Id == 0 ? "Create" : "Update") product</h2>
     </div>
 
     <div class="card-body">
         <form method="post" enctype="multipart/form-data">
+            <input asp-for="Product.Id" hidden />
             <div class="form-floating py-2">
                 <input asp-for="Product.Title" class="form-control border-0 shadow" />
                 <label asp-for="Product.Title"></label>
@@ -70,9 +71,16 @@
                 <label asp-for="Product.ImageUrl"></label>
             </div>
 
-            <div class="row py-2 d-flex justify-content-center">
+            <div class="row py-2 d-flex justify-content-center mb-4">
                 <div class="col-6 col-md-3">
-                    <button type="submit" class="btn btn-primary form-control ">Create</button>
+                    @if (Model.Product.Id == 0)
+                    {
+                        <button type="submit" class="btn btn-primary form-control ">Create</button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-primary form-control ">Update</button>
+                    }
                 </div>
                 <div class="col-6 col-md-3">
                     <a asp-area="Customer" asp-controller="Product" asp-action="Index" class="btn btn-outline-primary form-control border">Go back</a>

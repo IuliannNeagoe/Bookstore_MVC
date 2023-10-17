@@ -24,8 +24,8 @@ namespace BookstoreWeb.Areas.Customer.Controllers
 
         #endregion
 
-        #region Create
-        public IActionResult Create()
+        #region Upsert
+        public IActionResult Upsert(int? myId)
         {
             //obtain the Categories to pass onto the dropdown
             var categoriesFromDb = _unitOfWork.CategoryRepository.GetAll();
@@ -39,14 +39,25 @@ namespace BookstoreWeb.Areas.Customer.Controllers
 
 
             ProductViewModel productViewModel = new ProductViewModel();
-            productViewModel.Product = new Product();
+
+            //if ID is not present, then we are Creating
+            if (myId == null || myId == 0)
+            {
+                productViewModel.Product = new Product();
+            }
+            else
+            {
+                //else we are updating an existing product
+                productViewModel.Product = _unitOfWork.ProductRepository.Get(p => p.Id == myId);
+            }
+
             productViewModel.CategoryList = categoryList;
 
             return View(productViewModel);
         }
 
         [HttpPost]
-        public IActionResult Create(ProductViewModel productViewModel)
+        public IActionResult Upsert(ProductViewModel productViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -66,32 +77,6 @@ namespace BookstoreWeb.Areas.Customer.Controllers
             TempData["success"] = "Product created successfully!";
             return RedirectToAction("Index", "Product");
         }
-        #endregion
-
-        #region Edit
-        public IActionResult Edit(int? myId)
-        {
-            Product? productToEdit = _unitOfWork.ProductRepository.Get(p => p.Id == myId);
-            if (productToEdit == null) return NotFound();
-            
-            return View(productToEdit);    
-        }
-
-        [HttpPost]
-        public IActionResult Edit(Product product)
-        {
-           
-            if (product == null) return NotFound();
-
-            if (!ModelState.IsValid) return View();
-
-            _unitOfWork.ProductRepository.Update(product);
-            _unitOfWork.Save();
-
-            TempData["success"] = "Product updated successfully!";
-            return RedirectToAction("Index", "Product");
-        }
-
         #endregion
 
         #region Delete
