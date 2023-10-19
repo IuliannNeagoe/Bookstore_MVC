@@ -2,6 +2,7 @@
 using Bookstore.Models.Models;
 using Bookstore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Net;
 
@@ -60,7 +61,7 @@ namespace BookstoreWeb.Areas.Customer.Controllers
         }
 
         [HttpPost]
-        public IActionResult Upsert(ProductViewModel productViewModel, IFormFile myFile)
+        public IActionResult Upsert(ProductViewModel productViewModel, [BindNever] IFormFile myFile)
         {
             if (!ModelState.IsValid)
             {
