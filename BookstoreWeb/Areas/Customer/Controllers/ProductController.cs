@@ -61,7 +61,7 @@ namespace BookstoreWeb.Areas.Customer.Controllers
         }
 
         [HttpPost]
-        public IActionResult Upsert(ProductViewModel productViewModel, [BindNever] IFormFile myFile)
+        public IActionResult Upsert(ProductViewModel productViewModel, IFormFile? myFile)
         {
             if (!ModelState.IsValid)
             {
