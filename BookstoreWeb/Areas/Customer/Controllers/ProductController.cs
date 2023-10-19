@@ -2,9 +2,7 @@
 using Bookstore.Models.Models;
 using Bookstore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Net;
 
 namespace BookstoreWeb.Areas.Customer.Controllers
 {
@@ -22,7 +20,7 @@ namespace BookstoreWeb.Areas.Customer.Controllers
         #region Index
         public IActionResult Index()
         {
-            var products = _unitOfWork.ProductRepository.GetAll();
+            var products = _unitOfWork.ProductRepository.GetAll(includeProperties:"Category");
             return View(products);
         }
 

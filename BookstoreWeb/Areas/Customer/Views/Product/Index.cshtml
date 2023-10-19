@@ -29,7 +29,7 @@
                             <td class="col-2">@product.Author</td>
                             <td class="col-2">@product.ISBN</td>
                             <td class="col-2">@product.Price</td>
-                            <td class="col-2"></td>
+                            <td class="col-2">@product.Category.Name</td>
                             <td class="col-4">
                                 <div class="d-flex justify-content-center">
                                     <a asp-area="Customer" asp-controller="Product" asp-action="Upsert" asp-route-myId="@product.Id" class="btn btn-primary mx-2"> Edit</a>

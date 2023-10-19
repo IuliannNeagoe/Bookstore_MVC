@@ -15,18 +15,42 @@ namespace Bookstore.DataAccess.Repositories
             _dbSet = _db.Set<T>();  //_db.Categories == dbSet
         }
 
-        public T Get(Expression<Func<T, bool>> filter)
+        public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null)
         {
             IQueryable<T> query = _dbSet;
+
+            ExecuteObjectToForeignKeyRelation(ref query, includeProperties);
+
             query = query.Where(filter);
             return query.FirstOrDefault();
         }
+
+        
+
         public void Add(T entity) => _dbSet.Add(entity);
 
-        public IEnumerable<T> GetAll() => _dbSet.ToList();
+        //includeProperties - Category    - this is used to map an actual CategoryObject with the existing CategoryId
+        public IEnumerable<T> GetAll(string? includeProperties = null)
+        {
+            IQueryable<T> query = _dbSet.AsQueryable<T>();
+            ExecuteObjectToForeignKeyRelation(ref query, includeProperties);
+            return query.ToList();
+        }
 
         public void Remove(T entity) => _dbSet.Remove(entity);
 
         public void RemoveRange(IEnumerable<T> entities) => _dbSet.RemoveRange(entities);
+
+        private void ExecuteObjectToForeignKeyRelation(ref IQueryable<T> query, string? includeProperties)
+        {
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                var propertiesToInclude = includeProperties.Split(",", StringSplitOptions.RemoveEmptyEntries);
+                foreach (var property in propertiesToInclude)
+                {
+                    query = query.Include(property);
+                }
+            }
+        }
     }
 }
