@@ -5,11 +5,11 @@ using System.Linq.Expressions;
 
 namespace Bookstore.DataAccess.Repositories
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public abstract class RepositoryBase<T> : IRepository<T> where T : class
     {
         private readonly ApplicationDbContext _db;
         private DbSet<T> _dbSet;
-        public Repository(ApplicationDbContext db)
+        public RepositoryBase(ApplicationDbContext db)
         {
             _db = db;
             _dbSet = _db.Set<T>();  //_db.Categories == dbSet

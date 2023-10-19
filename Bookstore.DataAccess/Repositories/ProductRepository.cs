@@ -4,7 +4,7 @@ using Bookstore.Models.Models;
 
 namespace Bookstore.DataAccess.Repositories
 {
-    public class ProductRepository : Repository<Product>, IProductRepository
+    public class ProductRepository : RepositoryBase<Product>, IProductRepository
     {
         private readonly ApplicationDbContext _db;
         public ProductRepository(ApplicationDbContext db) : base(db)
