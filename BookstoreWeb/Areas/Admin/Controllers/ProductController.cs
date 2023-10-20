@@ -111,27 +111,31 @@ namespace BookstoreWeb.Areas.Admin.Controllers
         #endregion
 
         #region Delete
-        public IActionResult Delete(int? id)
-        {
-            if (id == null) return NotFound();
-            Product? productToDelete = _unitOfWork.ProductRepository.Get(p => p.Id == id);
+        /// <summary>
+        /// obsolete
+        /// </summary>
+        /// <returns></returns>
+        //public IActionResult Delete(int? id)
+        //{
+        //    if (id == null) return NotFound();
+        //    Product? productToDelete = _unitOfWork.ProductRepository.Get(p => p.Id == id);
 
-            if (productToDelete == null) return NotFound();
+        //    if (productToDelete == null) return NotFound();
 
-            return View(productToDelete);
-        }
+        //    return View(productToDelete);
+        //}
 
-        [HttpPost, ActionName("Delete")]
-        public IActionResult DeletePOST(int? id)
-        {
-            if (id == null) return NotFound();
+        //[HttpPost, ActionName("Delete")]
+        //public IActionResult DeletePOST(int? id)
+        //{
+        //    if (id == null) return NotFound();
 
-            Product? productToDelete = _unitOfWork.ProductRepository.Get(p => p.Id == id);
-            _unitOfWork.ProductRepository.Remove(productToDelete);
-            _unitOfWork.Save();
-            TempData["success"] = "Product deleted successfully!";
-            return RedirectToAction("Index");
-        }
+        //    Product? productToDelete = _unitOfWork.ProductRepository.Get(p => p.Id == id);
+        //    _unitOfWork.ProductRepository.Remove(productToDelete);
+        //    _unitOfWork.Save();
+        //    TempData["success"] = "Product deleted successfully!";
+        //    return RedirectToAction("Index");
+        //}
 
         #endregion
 
@@ -142,6 +146,28 @@ namespace BookstoreWeb.Areas.Admin.Controllers
             var products = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category");
 
             return Json(new { data = products });
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int? id)
+        {
+            if(id == null) return Json(new { success = false, message = "Error! Product ID not valid!" });
+
+            Product? productToDelete = _unitOfWork.ProductRepository.Get(p => p.Id == id);
+            if (productToDelete == null) return Json(new { success = false, message = "Error! Product not found in database!" });
+
+            //delete the old image
+            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToDelete.ImageUrl.TrimStart('\\'));
+
+            if (System.IO.File.Exists(oldImagePath))
+            {
+                System.IO.File.Delete(oldImagePath);
+            }
+
+            _unitOfWork.ProductRepository.Remove(productToDelete);
+            _unitOfWork.Save();
+
+            return Json(new { success = true, message = "Product deleted successfully!" });
         }
         #endregion
         #region Private methods
