@@ -1,8 +1,28 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model IEnumerable<Product>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    @foreach (var product in Model)
+    {
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-4">
+            <div class="card shadow border-0 rounded-2">
+                <img src="@product.ImageUrl" class="card-img-top rounded-top-2" alt="@product.Title">
+                <div class="card-body">
+                    <h5 class="card-title text-dark opacity-75 text-center text-uppercase">@product.Title</h5>
+                    <p class="card-text text-center text-warning mb-2">by <strong>@product.Author</strong></p>
+                    <p class="card-text text-center opacity-75 mb-1">List price: <span class="text-decoration-line-through">@product.ListPrice.ToString("c")</span></p>
+                    <p class="card-text text-center opacity-75 mb-1">Starting at: @product.Price.ToString("c")</p>
+
+                    <div class="row">
+                        <div class=" border-0 col-12 mb-2 px-3">
+                            <a asp-area="Customer" asp-controller="Home" asp-action="Details" asp-route-myId="@product.Id" class="btn btn-primary bg-gradient border-0  d-flex align-items-center justify-content-center">Details</a>
+                        </div>
+                        <div class=" border-0 col-12 px-3">
+                            <a href="#" class="btn btn-primary bg-gradient border-0  d-flex align-items-center justify-content-center">Buy</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
 </div>
