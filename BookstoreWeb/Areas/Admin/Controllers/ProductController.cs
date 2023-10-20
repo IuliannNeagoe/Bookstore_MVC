@@ -174,6 +174,7 @@ namespace BookstoreWeb.Areas.Admin.Controllers
             return Json(new { success = true, message = "Product deleted successfully!" });
         }
         #endregion
+
         #region Private methods
         private bool UploadImage(IFormFile myFile, out string? fileName)
         {
