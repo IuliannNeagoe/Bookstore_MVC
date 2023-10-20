@@ -148,7 +148,7 @@ namespace BookstoreWeb.Areas.Admin.Controllers
             return Json(new { data = products });
         }
 
-        [HttpGet]
+        [HttpDelete]
         public IActionResult Delete(int? id)
         {
             if(id == null) return Json(new { success = false, message = "Error! Product ID not valid!" });
@@ -157,13 +157,17 @@ namespace BookstoreWeb.Areas.Admin.Controllers
             if (productToDelete == null) return Json(new { success = false, message = "Error! Product not found in database!" });
 
             //delete the old image
-            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToDelete.ImageUrl.TrimStart('\\'));
-
-            if (System.IO.File.Exists(oldImagePath))
+           
+            if (!string.IsNullOrEmpty(productToDelete.ImageUrl))
             {
-                System.IO.File.Delete(oldImagePath);
+                string oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToDelete.ImageUrl?.TrimStart('\\'));
+                
+                if (System.IO.File.Exists(oldImagePath))
+                {
+                    System.IO.File.Delete(oldImagePath);
+                }
             }
-
+           
             _unitOfWork.ProductRepository.Remove(productToDelete);
             _unitOfWork.Save();
 
