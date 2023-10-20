@@ -4,9 +4,9 @@ using Bookstore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace BookstoreWeb.Areas.Customer.Controllers
+namespace BookstoreWeb.Areas.Admin.Controllers
 {
-    [Area("Customer")]
+    [Area("Admin")]
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -20,13 +20,13 @@ namespace BookstoreWeb.Areas.Customer.Controllers
         #region Index
         public IActionResult Index()
         {
-            var products = _unitOfWork.ProductRepository.GetAll(includeProperties:"Category");
+            var products = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category");
             return View(products);
         }
 
         #endregion
 
-        #region Upsert
+        #region Upsert 
         public IActionResult Upsert(int? myId)
         {
             //obtain the Categories to pass onto the dropdown
@@ -80,20 +80,20 @@ namespace BookstoreWeb.Areas.Customer.Controllers
                 if (!string.IsNullOrEmpty(productViewModel.Product.ImageUrl))
                 {
                     var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productViewModel.Product.ImageUrl.TrimStart('\\'));
-                    if(System.IO.File.Exists(oldImagePath))
+                    if (System.IO.File.Exists(oldImagePath))
                     {
                         System.IO.File.Delete(oldImagePath);
                     }
                 }
 
-                if(UploadImage(myFile, out string? fileName))
+                if (UploadImage(myFile, out string? fileName))
                 {
                     productViewModel.Product.ImageUrl = @"\images\product\" + fileName;
                 }
             }
-            
-            
-            if(productViewModel.Product.Id == 0) 
+
+
+            if (productViewModel.Product.Id == 0)
             {
                 _unitOfWork.ProductRepository.Add(productViewModel.Product);
             }
@@ -135,8 +135,16 @@ namespace BookstoreWeb.Areas.Customer.Controllers
 
         #endregion
 
+        #region API Calls
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var products = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category");
 
-
+            return Json(new { data = products });
+        }
+        #endregion
+        #region Private methods
         private bool UploadImage(IFormFile myFile, out string? fileName)
         {
             string productFolderPath = _webHostEnvironment.WebRootPath + @"\images\product";
@@ -158,5 +166,7 @@ namespace BookstoreWeb.Areas.Customer.Controllers
                 return false;
             }
         }
+
+        #endregion
     }
 }
