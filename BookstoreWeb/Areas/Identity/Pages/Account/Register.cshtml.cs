@@ -17,7 +17,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -102,11 +104,15 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+            public string? Role { get; set; }
+            [ValidateNever]
+            public IEnumerable<SelectListItem> Roles { get; set; }
         }
 
 
         public async Task OnGetAsync(string returnUrl = null)
         {
+            //this is the same as await
             if (!_roleManager.RoleExistsAsync(ConstantDefines.Role_Customer).GetAwaiter().GetResult())
             {
                 await _roleManager.CreateAsync(new IdentityRole(ConstantDefines.Role_Admin));
@@ -114,6 +120,12 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
                 await _roleManager.CreateAsync(new IdentityRole(ConstantDefines.Role_Customer));
                 await _roleManager.CreateAsync(new IdentityRole(ConstantDefines.Role_Company));
             }
+
+            Input = new()
+            {
+                Roles = _roleManager.Roles.Select(r => new SelectListItem() { Text = r.Name, Value = r.Name }),
+            };
+
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
@@ -133,6 +145,10 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    string userRole = string.IsNullOrEmpty(Input.Role) ? ConstantDefines.Role_Customer : Input.Role;
+
+                    await _userManager.AddToRoleAsync(user, userRole);
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
