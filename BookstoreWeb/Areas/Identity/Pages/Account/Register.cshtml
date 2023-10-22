@@ -23,6 +23,11 @@
                         <label asp-for="Input.Email">Email</label>
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Name" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                        <label asp-for="Input.Name">Name</label>
+                        <span asp-validation-for="Input.Name" class="text-danger"></span>
+                    </div>
                     <div class="row">
                         <div class="form-floating col-md-6 col-sm-12 mb-3">
                             <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
@@ -36,12 +41,43 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="mb-3 col-6">
+                        <div class="form-floating col-md-6 col-sm-12 mb-3">
+                            <input asp-for="Input.StreetAddress" class="form-control" autocomplete="address" aria-required="true" placeholder="st.example12" />
+                            <label asp-for="Input.StreetAddress" class="ms-2">Street Address</label>
+                            <span asp-validation-for="Input.StreetAddress" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating col-md-6 col-sm-12 mb-3">
+                            <input asp-for="Input.City" class="form-control" autocomplete="city" aria-required="true" placeholder="city" />
+                            <label asp-for="Input.City" class="ms-2">City</label>
+                            <span asp-validation-for="Input.City" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-floating col-md-6 col-sm-12 mb-3">
+                            <input asp-for="Input.State" class="form-control" autocomplete="state" aria-required="true" placeholder="state" />
+                            <label asp-for="Input.State" class="ms-2">State</label>
+                            <span asp-validation-for="Input.State" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating col-md-6 col-sm-12 mb-3">
+                            <input asp-for="Input.PhoneNumber" class="form-control" autocomplete="number" aria-required="true" placeholder="number" />
+                            <label asp-for="Input.PhoneNumber" class="ms-2">Phone Number</label>
+                            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                        </div>
+                       
+                    </div>
+                    <div class="row">
+                        <div class="form-floating col-md-6  mb-3">
+                            <input asp-for="Input.PostalCode" class="form-control" autocomplete="pcode" aria-required="true" placeholder="pcode" />
+                            <label asp-for="Input.PostalCode" class="ms-2">Postal Code</label>
+                            <span asp-validation-for="Input.PostalCode" class="text-danger"></span>
+                        </div>
+                        <div class=" mb-3 col-6  mb-3">
                             <select asp-for="Input.Role" asp-items="@Model.Input.Roles" class="form-select p-3" aria-required="true">
                                 <option selected disabled>-- Select a role --</option>
                             </select>
                         </div>
                     </div>
+                  
                    
                     <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
                 </form>
