@@ -1,12 +1,15 @@
 ﻿using Bookstore.DataAccess.Repositories.Interfaces;
 using Bookstore.Models.Models;
 using Bookstore.Models.ViewModels;
+using Bookstore.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BookstoreWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = ConstantDefines.Role_Admin)] //this can also be set individually for any action
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
