@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using Bookstore.DataAccess.Repositories.Interfaces;
 using Bookstore.Models.Models;
 using Bookstore.Utility;
 using Microsoft.AspNetCore.Authentication;
@@ -34,6 +35,7 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IUnitOfWork _unitOfWork;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -41,7 +43,8 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -50,6 +53,7 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -108,6 +112,10 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
             [ValidateNever]
             public IEnumerable<SelectListItem> Roles { get; set; }
 
+            public int? CompanyId { get; set; }
+            [ValidateNever]
+            public IEnumerable<SelectListItem> Companies { get; set; }
+
             public string? StreetAddress { get; set; }
             public string? City { get; set; }
             public string? State { get; set; }
@@ -131,6 +139,7 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
             Input = new()
             {
                 Roles = _roleManager.Roles.Select(r => new SelectListItem() { Text = r.Name, Value = r.Name }),
+                Companies = _unitOfWork.CompanyRepository.GetAll().Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString()})
             };
             
             ReturnUrl = returnUrl;
