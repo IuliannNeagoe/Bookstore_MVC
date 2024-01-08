@@ -132,7 +132,7 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
             {
                 Roles = _roleManager.Roles.Select(r => new SelectListItem() { Text = r.Name, Value = r.Name }),
             };
-
+            
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
@@ -188,12 +188,12 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
                 }
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError("Input.Password", error.Description);
                 }
             }
 
             // If we got this far, something failed, redisplay form
-            return RedirectToPage("Register", new { returnUrl = returnUrl});
+            return RedirectToPage();
         }
 
         private ApplicationUser CreateUser()

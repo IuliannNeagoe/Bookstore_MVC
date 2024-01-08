@@ -9,6 +9,7 @@ namespace Bookstore.DataAccess.Data
     {
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Company> Companies { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options): base(options)
@@ -27,6 +28,10 @@ namespace Bookstore.DataAccess.Data
                 new Category() { Id=3, Name="History", DisplayOrder=3}
             );
 
+            modelBuilder.Entity<Company>().HasData(
+                new Company() { Id = 1, Name = "TechCompany", City="Pitesti", PhoneNumber="+407223752812", State = "RO", StreetAddress="Bd. N. Balcescu 123", PostalCode="110123" },
+                new Company() { Id = 2, Name = "ArtCompany", City = "Pitesti", PhoneNumber = "+40726123923", State = "RO", StreetAddress = "Bd. N. Balcescu 122", PostalCode = "110523" }
+            );
 
 
             modelBuilder.Entity<Product>().HasData(
