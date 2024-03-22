@@ -32,9 +32,14 @@ namespace Bookstore.DataAccess.Repositories
         public void Add(T entity) => _dbSet.Add(entity);
 
         //includeProperties - Category    - this is used to map an actual CategoryObject with the existing CategoryId
-        public IEnumerable<T> GetAll(string? includeProperties = null)
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
         {
             IQueryable<T> query = _dbSet.AsQueryable<T>();
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
             ExecuteObjectToForeignKeyRelation(ref query, includeProperties);
             return query.ToList();
         }
