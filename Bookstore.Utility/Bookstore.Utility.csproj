@@ -10,4 +10,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.0-rc.2.23480.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Bookstore.Models\Bookstore.Models.csproj" />
+  </ItemGroup>
+
 </Project>
