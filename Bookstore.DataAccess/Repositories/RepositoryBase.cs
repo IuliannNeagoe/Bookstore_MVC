@@ -15,9 +15,11 @@ namespace Bookstore.DataAccess.Repositories
             _dbSet = _db.Set<T>();  //_db.Categories == dbSet
         }
 
-        public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)
         {
-            IQueryable<T> query = _dbSet;
+            //AsNoTracking() => repository.Update(entity) is mandatory
+            //By default, Update doesnt have to be called (if you modify an entityFromDb then Save, it will get updated
+            IQueryable<T> query = tracked ? _dbSet : _dbSet.AsNoTracking();
 
             ExecuteObjectToForeignKeyRelation(ref query, includeProperties);
 
@@ -25,7 +27,7 @@ namespace Bookstore.DataAccess.Repositories
             return query.FirstOrDefault();
         }
 
-        
+
 
         public void Add(T entity) => _dbSet.Add(entity);
 

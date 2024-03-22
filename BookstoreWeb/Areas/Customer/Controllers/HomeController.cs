@@ -1,6 +1,5 @@
 using Bookstore.DataAccess.Repositories.Interfaces;
 using Bookstore.Models.Models;
-using Bookstore.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -49,9 +48,9 @@ namespace BookstoreWeb.Areas.Customer.Controllers
                 Count = 1,
                 ProductId = myId.Value
             };
-         
 
-            if(cart.Product == null) return NotFound();
+
+            if (cart.Product == null) return NotFound();
 
             return View(cart);
         }
@@ -76,6 +75,8 @@ namespace BookstoreWeb.Areas.Customer.Controllers
             {
                 _unitOfWork.ShoppingCartRepository.Add(cart);
             }
+
+            TempData["success"] = "Cart updated successfully!";
             _unitOfWork.Save();
 
             return RedirectToAction(nameof(Index));

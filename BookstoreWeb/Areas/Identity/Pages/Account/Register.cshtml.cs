@@ -2,19 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 using Bookstore.DataAccess.Repositories.Interfaces;
 using Bookstore.Models.Models;
 using Bookstore.Utility;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +13,9 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
+using System.Text.Encodings.Web;
 
 namespace BookstoreWeb.Areas.Identity.Pages.Account
 {
@@ -139,9 +132,9 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
             Input = new()
             {
                 Roles = _roleManager.Roles.Select(r => new SelectListItem() { Text = r.Name, Value = r.Name }),
-                Companies = _unitOfWork.CompanyRepository.GetAll().Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString()})
+                Companies = _unitOfWork.CompanyRepository.GetAll().Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() })
             };
-            
+
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
@@ -156,14 +149,14 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                
+
                 user.Name = Input.Name;
                 user.StreetAddress = Input.StreetAddress;
                 user.State = Input.State;
                 user.PhoneNumber = Input.PhoneNumber;
                 user.PostalCode = Input.PostalCode;
 
-                if(Input.Role == ConstantDefines.Role_Company)
+                if (Input.Role == ConstantDefines.Role_Company)
                 {
                     user.CompanyId = Input.CompanyId;
                 }
@@ -203,6 +196,11 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError("Input.Password", error.Description);
+                }
+
+                if (result.Errors.Any())
+                {
+                    return Page();
                 }
             }
 
