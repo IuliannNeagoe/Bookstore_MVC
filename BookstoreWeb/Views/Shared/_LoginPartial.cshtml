@@ -2,14 +2,14 @@
 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-
+@inject ShoppingCartViewModel ShoppingCartViewModel
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
     <li class="nav-item">
         <a class="nav-link" asp-area="Customer" asp-controller="ShoppingCart" asp-action="Index">
             <span style="font-weight:bold;">
-                <i class="bi bi-cart"></i> &nbsp; (0)
+                <i class="bi bi-cart"></i> &nbsp; (@ShoppingCartViewModel.ListedItems.Count())
             </span>
         </a>
     </li>

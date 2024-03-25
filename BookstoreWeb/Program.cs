@@ -1,10 +1,11 @@
 using Bookstore.DataAccess.Data;
 using Bookstore.DataAccess.Repositories;
 using Bookstore.DataAccess.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
+using Bookstore.Models.ViewModels;
 using Bookstore.Utility;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,14 +13,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => 
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
     );
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
 //this has to be added after the "AddIdentity"
-builder.Services.ConfigureApplicationCookie(options => {
+builder.Services.ConfigureApplicationCookie(options =>
+{
     options.LoginPath = $"/Identity/Account/Login";
     options.LogoutPath = $"/Identity/Account/Logout";
     options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
@@ -28,6 +30,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //because of adding roles to the AddIdentity method, we need to add an implementation of EmailSender
 builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddSingleton<ShoppingCartViewModel>();
 
 var app = builder.Build();
 

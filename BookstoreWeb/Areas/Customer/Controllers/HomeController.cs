@@ -1,5 +1,6 @@
 using Bookstore.DataAccess.Repositories.Interfaces;
 using Bookstore.Models.Models;
+using Bookstore.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -12,16 +13,28 @@ namespace BookstoreWeb.Areas.Customer.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IUnitOfWork _unitOfWork;
-        public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork)
+        private readonly ShoppingCartViewModel _shoppingCartViewModel;
+        public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork, ShoppingCartViewModel shoppingCartViewModel)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _shoppingCartViewModel = shoppingCartViewModel;
         }
 
         #region Index
         public IActionResult Index()
         {
             var productsFromDb = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category");
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            if (claimsIdentity.IsAuthenticated)
+            {
+                var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                var existingCartFromDb = _unitOfWork.ShoppingCartRepository.GetAll(c => c.ApplicationUserId == userId);
+                _shoppingCartViewModel.ListedItems = existingCartFromDb.ToList();
+            }
+
             return View(productsFromDb);
         }
         #endregion
