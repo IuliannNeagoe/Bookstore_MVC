@@ -78,5 +78,10 @@ namespace BookstoreWeb.Areas.Customer.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public IActionResult Summary(ShoppingCartViewModel shoppingCartViewModel)
+        {
+            return View(ShoppingCartViewModel);
+        }
+
     }
 }

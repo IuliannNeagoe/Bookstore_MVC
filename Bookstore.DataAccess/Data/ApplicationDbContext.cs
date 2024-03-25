@@ -5,17 +5,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.DataAccess.Data
 {
-    public class ApplicationDbContext: IdentityDbContext<IdentityUser>
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        public DbSet<OrderHeader> OrderHeaders { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options): base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-            
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -24,13 +26,13 @@ namespace Bookstore.DataAccess.Data
 
             //seed the db
             modelBuilder.Entity<Category>().HasData(
-                new Category() { Id=1, Name="Action", DisplayOrder=1},
-                new Category() { Id=2, Name="SciFi", DisplayOrder=2},
-                new Category() { Id=3, Name="History", DisplayOrder=3}
+                new Category() { Id = 1, Name = "Action", DisplayOrder = 1 },
+                new Category() { Id = 2, Name = "SciFi", DisplayOrder = 2 },
+                new Category() { Id = 3, Name = "History", DisplayOrder = 3 }
             );
 
             modelBuilder.Entity<Company>().HasData(
-                new Company() { Id = 1, Name = "TechCompany", City="Pitesti", PhoneNumber="+407223752812", State = "RO", StreetAddress="Bd. N. Balcescu 123", PostalCode="110123" },
+                new Company() { Id = 1, Name = "TechCompany", City = "Pitesti", PhoneNumber = "+407223752812", State = "RO", StreetAddress = "Bd. N. Balcescu 123", PostalCode = "110123" },
                 new Company() { Id = 2, Name = "ArtCompany", City = "Pitesti", PhoneNumber = "+40726123923", State = "RO", StreetAddress = "Bd. N. Balcescu 122", PostalCode = "110523" }
             );
 
