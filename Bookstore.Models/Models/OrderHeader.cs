@@ -26,6 +26,7 @@ namespace Bookstore.Models.Models
 
         //used for future Stripe integration
         public string? PaymentIntentId { get; set; }
+        public string? SessionId { get; set; }
 
         [Required]
         public string PhoneNumber { get; set; }

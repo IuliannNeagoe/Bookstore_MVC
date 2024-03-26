@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 wwwroot/images/product/
 /BookstoreWeb/wwwroot/images/product
+/BookstoreWeb/wwwroot/images
+/BookstoreWeb/appsettings.json
+/BookstoreWeb/BookstoreWeb.csproj
