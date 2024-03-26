@@ -17,6 +17,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0-rc.2.23509.1" />
+    <PackageReference Include="Stripe.net" Version="43.20.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,7 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\images\product\" />
+    <UpToDateCheckInput Remove="Areas\Customer\Views\ShoppingCart\OrderConfirmation.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Areas\Customer\Views\ShoppingCart\OrderConfirmation.cshtml" />
   </ItemGroup>
 
 </Project>
