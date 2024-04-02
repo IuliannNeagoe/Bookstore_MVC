@@ -3,8 +3,10 @@ using Bookstore.Models.Models;
 using Bookstore.Models.ViewModels;
 using Bookstore.Utility;
 using Bookstore.Utility.Helper;
+using BookstoreWeb.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stripe.Checkout;
 using System.Security.Claims;
 
 namespace BookstoreWeb.Areas.Customer.Controllers
@@ -130,11 +132,11 @@ namespace BookstoreWeb.Areas.Customer.Controllers
 
             var applicationUser = _unitOfWork.ApplicationUserRepository.Get(u => u.Id == userId);
 
-            //foreach (var item in ShoppingCartViewModel.ListedItems)
-            //{
-            //    item.Price = MathHelper.GetPriceBasedOnQuantity(item);
-            //    ShoppingCartViewModel.OrderHeader.OrderTotal += item.Price * item.Count;
-            //}
+            foreach (var item in ShoppingCartViewModel.ListedItems)
+            {
+                item.Price = MathHelper.GetPriceBasedOnQuantity(item);
+            }
+
             bool isCompanyUser = applicationUser.CompanyId.HasValue;
 
             if (!isCompanyUser)
@@ -168,10 +170,37 @@ namespace BookstoreWeb.Areas.Customer.Controllers
                 _unitOfWork.Save();
             }
 
-            if (isCompanyUser)
+            if (!isCompanyUser)
             {
-                //capture payment
-                //future stripe implementation
+                //regular user 
+                //capture payment with stripe logic
+                IEnumerable<SessionLineItemOptions> lineOptions = ShoppingCartViewModel.ListedItems.Select(item =>
+                    new SessionLineItemOptions()
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions()
+                        {
+                            Currency = "usd",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions()
+                            {
+                                Description = item.Product.Description,
+                                Name = item.Product.Title
+                            },
+                            UnitAmount = (long)item.Price * 100
+                        },
+                        Quantity = item.Count
+                    });
+
+
+                Session session = StripeHelper.CreateStripeSession(lineOptions,
+                    StringHelper.BuildUrl("Customer", "ShoppingCart", nameof(OrderConfirmation), ShoppingCartViewModel.OrderHeader.Id.ToString()),
+                    StringHelper.BuildUrl("Customer", "ShoppingCart", nameof(Index)));
+
+                _unitOfWork.OrderHeaderRepository.UpdateStripePaymentId(ShoppingCartViewModel.OrderHeader.Id, session.Id, session.PaymentIntentId);
+                _unitOfWork.Save();
+
+                Response.Headers.Add("Location", session.Url);
+                return new StatusCodeResult(303);
+
             }
 
             return RedirectToAction(nameof(OrderConfirmation), new { id = ShoppingCartViewModel.OrderHeader.Id });
@@ -179,6 +208,28 @@ namespace BookstoreWeb.Areas.Customer.Controllers
 
         public IActionResult OrderConfirmation(int id)
         {
+            var orderHeaderFromDb = _unitOfWork.OrderHeaderRepository.Get(o => o.Id == id, nameof(ApplicationUser));
+            if (orderHeaderFromDb == null) return NoContent();
+
+            if (orderHeaderFromDb.PaymentStatus != PaymentStatus.ApprovedForDelayedPayment.ToString())
+            {
+                //order placed by regular user => check if payment was successful
+                var service = new SessionService();
+                var session = service.Get(orderHeaderFromDb.SessionId);
+
+                if (session.PaymentStatus.ToLower() == "paid")
+                {
+                    _unitOfWork.OrderHeaderRepository.UpdateStripePaymentId(id, session.Id, session.PaymentIntentId);
+                    _unitOfWork.OrderHeaderRepository.UpdateStatus(id, OrderStatus.Approved, PaymentStatus.Approved);
+
+                    //remove shoppingcart from db, because it was purchased
+                    var shoppingCarts = _unitOfWork.ShoppingCartRepository
+                        .GetAll(s => s.ApplicationUserId == orderHeaderFromDb.ApplicationUserId).ToList();
+                    _unitOfWork.ShoppingCartRepository.RemoveRange(shoppingCarts);
+
+                    _unitOfWork.Save();
+                }
+            }
             return View(id);
         }
 
