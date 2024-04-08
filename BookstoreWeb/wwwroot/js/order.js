@@ -1,11 +1,23 @@
 var dataTable;
 $(document).ready(function () {
-    loadDataTable();
+    var url = window.location.search;
+    var status = "all";
+    if (url.includes("Processing")) {
+        status = "Processing";
+    } else if (url.includes("ApprovedForDelayedPayment")) {
+        status = "ApprovedForDelayedPayment";
+    } else if (url.includes("Shipped")) {
+        status = "Shipped";
+    } else if (url.includes("Approved")) {
+        status = "Approved";
+    }
+    
+    loadDataTable(status);
 })
 
-function loadDataTable() {
+function loadDataTable(status) {
     dataTable = $('#tblData').DataTable({
-        ajax: { url: '/admin/order/getall' },
+        ajax: { url: '/admin/order/getall?status=' + status },
         columns: [
             { data: 'id', "width": "5%" },
             { data: 'name', "width": "25%" },
@@ -20,7 +32,7 @@ function loadDataTable() {
                                 <a href="/admin/order/details?orderId=${data}" class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i></a>
                             </div>`
                 },
-                "width": "25%"
+                "width": "10%"
             }
         ]
     });
