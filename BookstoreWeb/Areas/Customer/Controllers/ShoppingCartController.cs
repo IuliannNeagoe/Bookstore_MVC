@@ -170,40 +170,39 @@ namespace BookstoreWeb.Areas.Customer.Controllers
                 _unitOfWork.Save();
             }
 
-            if (!isCompanyUser)
+            if (isCompanyUser)
             {
-                //regular user 
-                //capture payment with stripe logic
-                IEnumerable<SessionLineItemOptions> lineOptions = ShoppingCartViewModel.ListedItems.Select(item =>
-                    new SessionLineItemOptions()
-                    {
-                        PriceData = new SessionLineItemPriceDataOptions()
-                        {
-                            Currency = "usd",
-                            ProductData = new SessionLineItemPriceDataProductDataOptions()
-                            {
-                                Description = item.Product.Description,
-                                Name = item.Product.Title
-                            },
-                            UnitAmount = (long)item.Price * 100
-                        },
-                        Quantity = item.Count
-                    });
-
-
-                Session session = StripeHelper.CreateStripeSession(lineOptions,
-                    StringHelper.BuildUrl("Customer", "ShoppingCart", nameof(OrderConfirmation), ShoppingCartViewModel.OrderHeader.Id.ToString()),
-                    StringHelper.BuildUrl("Customer", "ShoppingCart", nameof(Index)));
-
-                _unitOfWork.OrderHeaderRepository.UpdateStripePaymentId(ShoppingCartViewModel.OrderHeader.Id, session.Id, session.PaymentIntentId);
-                _unitOfWork.Save();
-
-                Response.Headers.Add("Location", session.Url);
-                return new StatusCodeResult(303);
-
+                return RedirectToAction(nameof(OrderConfirmation), new { id = ShoppingCartViewModel.OrderHeader.Id });
             }
 
-            return RedirectToAction(nameof(OrderConfirmation), new { id = ShoppingCartViewModel.OrderHeader.Id });
+            //regular user 
+            //capture payment with stripe logic
+            IEnumerable<SessionLineItemOptions> lineOptions = ShoppingCartViewModel.ListedItems.Select(item =>
+                new SessionLineItemOptions()
+                {
+                    PriceData = new SessionLineItemPriceDataOptions()
+                    {
+                        Currency = "usd",
+                        ProductData = new SessionLineItemPriceDataProductDataOptions()
+                        {
+                            Description = item.Product.Description,
+                            Name = item.Product.Title
+                        },
+                        UnitAmount = (long)item.Price * 100
+                    },
+                    Quantity = item.Count
+                });
+
+
+            Session session = StripeHelper.CreateStripeSession(lineOptions,
+                StringHelper.BuildUrl("Customer", "ShoppingCart", nameof(OrderConfirmation), ShoppingCartViewModel.OrderHeader.Id.ToString()),
+                StringHelper.BuildUrl("Customer", "ShoppingCart", nameof(Index)));
+
+            _unitOfWork.OrderHeaderRepository.UpdateStripePaymentId(ShoppingCartViewModel.OrderHeader.Id, session.Id, session.PaymentIntentId);
+            _unitOfWork.Save();
+
+            Response.Headers.Add("Location", session.Url);
+            return new StatusCodeResult(303);
         }
 
         public IActionResult OrderConfirmation(int id)
