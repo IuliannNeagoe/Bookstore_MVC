@@ -1,7 +1,6 @@
 using Bookstore.DataAccess.Data;
 using Bookstore.DataAccess.Repositories;
 using Bookstore.DataAccess.Repositories.Interfaces;
-using Bookstore.Models.ViewModels;
 using Bookstore.Utility;
 using Bookstore.Utility.Stripe;
 using Microsoft.AspNetCore.Identity;
@@ -34,7 +33,6 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //because of adding roles to the AddIdentity method, we need to add an implementation of EmailSender
 builder.Services.AddScoped<IEmailSender, EmailSender>();
-builder.Services.AddSingleton<ShoppingCartViewModel>();
 
 var app = builder.Build();
 

@@ -1,15 +1,28 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using Bookstore.DataAccess.Repositories.Interfaces
+@using System.Security.Claims
 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-@inject ShoppingCartViewModel ShoppingCartViewModel
+@inject IUnitOfWork _unitOfWork
+@{
+    string userId = string.Empty;
+    IEnumerable<ShoppingCart> shoppingCarts = null;
+    var claimsIdentity = (ClaimsIdentity)User.Identity;
+    if (claimsIdentity.IsAuthenticated)
+    {
+        userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+        shoppingCarts = _unitOfWork.ShoppingCartRepository.GetAll(s => s.ApplicationUserId == userId);
+    }
+}
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
+       
+        <li class="nav-item">
         <a class="nav-link" asp-area="Customer" asp-controller="ShoppingCart" asp-action="Index">
             <span style="font-weight:bold;">
-                <i class="bi bi-cart"></i> &nbsp; (@ShoppingCartViewModel.ListedItems.Count())
+                <i class="bi bi-cart"></i> &nbsp; ( @shoppingCarts.Count() )
             </span>
         </a>
     </li>
