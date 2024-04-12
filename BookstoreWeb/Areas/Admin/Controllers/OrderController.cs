@@ -4,6 +4,7 @@ using Bookstore.Models.ViewModels;
 using Bookstore.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 using System.Security.Claims;
 using Product = Bookstore.Models.Models.Product;
 
@@ -99,6 +100,37 @@ namespace BookstoreWeb.Areas.Admin.Controllers
 
             TempData["Success"] = "Order Status Updated Successfully!";
 
+            return RedirectToAction(nameof(Details), new { orderId = OrderViewModel.OrderHeader.Id });
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = ConstantDefines.Role_Admin + "," + ConstantDefines.Role_Employee)]
+        public IActionResult CancelOrder()
+        {
+            var orderHeaderFromDb = _unitOfWork.OrderHeaderRepository.Get(o => o.Id == OrderViewModel.OrderHeader.Id);
+
+            if (orderHeaderFromDb.PaymentStatus == PaymentStatus.Approved.ToString())
+            {
+                //payment done, so the customer needs a refund
+                var options = new RefundCreateOptions()
+                {
+                    Reason = RefundReasons.RequestedByCustomer,
+                    PaymentIntent = orderHeaderFromDb.PaymentIntentId
+                };
+
+                var service = new RefundService();
+                Refund refund = service.Create(options);
+
+                _unitOfWork.OrderHeaderRepository.UpdateStatus(orderHeaderFromDb.Id, OrderStatus.Cancelled, PaymentStatus.Refunded);
+            }
+            else
+            {
+                _unitOfWork.OrderHeaderRepository.UpdateStatus(orderHeaderFromDb.Id, OrderStatus.Cancelled, PaymentStatus.Cancelled);
+            }
+
+            _unitOfWork.Save();
+            TempData["Success"] = "Order Cancelled Successfully!";
             return RedirectToAction(nameof(Details), new { orderId = OrderViewModel.OrderHeader.Id });
         }
 

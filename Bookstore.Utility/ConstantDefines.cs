@@ -10,6 +10,6 @@
 
     }
 
-    public enum OrderStatus { Pending, Approved, Processing, Shipped, Cancelled, Refunded }
-    public enum PaymentStatus { Pending, Approved, ApprovedForDelayedPayment, Rejected }
+    public enum OrderStatus { Pending, Approved, Processing, Shipped, Cancelled }
+    public enum PaymentStatus { Pending, Approved, ApprovedForDelayedPayment, Rejected, Refunded, Cancelled }
 }
