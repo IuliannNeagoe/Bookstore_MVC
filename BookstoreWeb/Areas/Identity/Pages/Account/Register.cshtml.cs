@@ -141,6 +141,11 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
+            Input.Roles = _roleManager.Roles.Select(r => new SelectListItem() { Text = r.Name, Value = r.Name });
+            Input.Companies = _unitOfWork.CompanyRepository.GetAll()
+                .Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
+
+
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)

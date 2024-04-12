@@ -2,9 +2,11 @@
 using Bookstore.Models.Models;
 using Bookstore.Models.ViewModels;
 using Bookstore.Utility;
+using Bookstore.Utility.Helper;
+using BookstoreWeb.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Stripe;
+using Stripe.Checkout;
 using System.Security.Claims;
 using Product = Bookstore.Models.Models.Product;
 
@@ -113,15 +115,7 @@ namespace BookstoreWeb.Areas.Admin.Controllers
             if (orderHeaderFromDb.PaymentStatus == PaymentStatus.Approved.ToString())
             {
                 //payment done, so the customer needs a refund
-                var options = new RefundCreateOptions()
-                {
-                    Reason = RefundReasons.RequestedByCustomer,
-                    PaymentIntent = orderHeaderFromDb.PaymentIntentId
-                };
-
-                var service = new RefundService();
-                Refund refund = service.Create(options);
-
+                StripeHelper.CreateStripeRefund(orderHeaderFromDb.PaymentIntentId);
                 _unitOfWork.OrderHeaderRepository.UpdateStatus(orderHeaderFromDb.Id, OrderStatus.Cancelled, PaymentStatus.Refunded);
             }
             else
@@ -134,6 +128,64 @@ namespace BookstoreWeb.Areas.Admin.Controllers
             return RedirectToAction(nameof(Details), new { orderId = OrderViewModel.OrderHeader.Id });
         }
 
+        [HttpPost]
+        public IActionResult PayForCompanyUsers()
+        {
+            OrderViewModel.OrderHeader =
+                _unitOfWork.OrderHeaderRepository.Get(o => o.Id == OrderViewModel.OrderHeader.Id,
+                    nameof(ApplicationUser));
+            OrderViewModel.OrderDetails =
+                _unitOfWork.OrderDetailRepository.GetAll(o => o.OrderHeaderId == OrderViewModel.OrderHeader.Id, nameof(Product));
+
+            //capture payment with stripe logic
+            IEnumerable<SessionLineItemOptions> lineOptions = OrderViewModel.OrderDetails.Select(item =>
+                new SessionLineItemOptions()
+                {
+                    PriceData = new SessionLineItemPriceDataOptions()
+                    {
+                        Currency = "usd",
+                        ProductData = new SessionLineItemPriceDataProductDataOptions()
+                        {
+                            Description = item.Product.Description,
+                            Name = item.Product.Title
+                        },
+                        UnitAmount = (long)item.Price * 100
+                    },
+                    Quantity = item.Count
+                });
+
+
+            Session session = StripeHelper.CreateStripeSession(lineOptions,
+                StringHelper.BuildUrl(nameof(Admin), "Order", nameof(PaymentConfirmation), OrderViewModel.OrderHeader.Id.ToString()),
+                StringHelper.BuildUrl(nameof(Admin), "Order", nameof(Details), OrderViewModel.OrderHeader.Id.ToString()));
+
+            _unitOfWork.OrderHeaderRepository.UpdateStripePaymentId(OrderViewModel.OrderHeader.Id, session.Id, session.PaymentIntentId);
+            _unitOfWork.Save();
+
+            Response.Headers.Add("Location", session.Url);
+            return new StatusCodeResult(303);
+        }
+
+        public IActionResult PaymentConfirmation(int id)
+        {
+            var orderHeaderFromDb = _unitOfWork.OrderHeaderRepository.Get(o => o.Id == id);
+
+            if (orderHeaderFromDb.PaymentStatus == PaymentStatus.ApprovedForDelayedPayment.ToString())
+            {
+                //check if payment was successful
+                var service = new SessionService();
+                var session = service.Get(orderHeaderFromDb.SessionId);
+
+                if (session.PaymentStatus.ToLower() == "paid")
+                {
+                    _unitOfWork.OrderHeaderRepository.UpdateStripePaymentId(id, session.Id, session.PaymentIntentId);
+                    _unitOfWork.OrderHeaderRepository.UpdateStatus(id, Enum.Parse<OrderStatus>(orderHeaderFromDb.OrderStatus), PaymentStatus.Approved);
+
+                    _unitOfWork.Save();
+                }
+            }
+            return View(id);
+        }
 
 
         #region API Calls

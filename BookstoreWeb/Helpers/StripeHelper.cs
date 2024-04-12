@@ -1,4 +1,5 @@
-﻿using Stripe.Checkout;
+﻿using Stripe;
+using Stripe.Checkout;
 
 namespace BookstoreWeb.Helpers
 {
@@ -14,6 +15,18 @@ namespace BookstoreWeb.Helpers
                 Mode = "payment",
             };
             var service = new Stripe.Checkout.SessionService();
+            return service.Create(options);
+        }
+
+        public static Refund CreateStripeRefund(string paymentIntentId)
+        {
+            var options = new RefundCreateOptions()
+            {
+                Reason = RefundReasons.RequestedByCustomer,
+                PaymentIntent = paymentIntentId
+            };
+
+            var service = new RefundService();
             return service.Create(options);
         }
     }
