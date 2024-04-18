@@ -7,14 +7,13 @@ using BookstoreWeb.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stripe.Checkout;
-using System.Security.Claims;
 using Product = Bookstore.Models.Models.Product;
 
 namespace BookstoreWeb.Areas.Admin.Controllers
 {
     [Area(nameof(Admin))]
     [Authorize]
-    public class OrderController : Controller
+    public class OrderController : ControllerCustomBase
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -192,9 +191,7 @@ namespace BookstoreWeb.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll(string? status)
         {
-
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = RetrieveUserId();
 
             var orderHeaders = (User.IsInRole(ConstantDefines.Role_Admin) ||
                             User.IsInRole(ConstantDefines.Role_Employee))

@@ -7,13 +7,12 @@ using BookstoreWeb.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stripe.Checkout;
-using System.Security.Claims;
 
 namespace BookstoreWeb.Areas.Customer.Controllers
 {
     [Area("Customer")]
     [Authorize]
-    public class ShoppingCartController : Controller
+    public class ShoppingCartController : ControllerCustomBase
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -27,8 +26,8 @@ namespace BookstoreWeb.Areas.Customer.Controllers
         }
         public IActionResult Index()
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var userId = RetrieveUserId();
             var items = _unitOfWork.ShoppingCartRepository.GetAll(c => c.ApplicationUserId == userId, nameof(Product));
             ShoppingCartViewModel = new ShoppingCartViewModel
             {
@@ -87,8 +86,7 @@ namespace BookstoreWeb.Areas.Customer.Controllers
 
         public IActionResult Summary()
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = RetrieveUserId();
             var items = _unitOfWork.ShoppingCartRepository.GetAll(c => c.ApplicationUserId == userId, nameof(Product));
             ShoppingCartViewModel = new ShoppingCartViewModel
             {
@@ -118,8 +116,7 @@ namespace BookstoreWeb.Areas.Customer.Controllers
         [ActionName(nameof(Summary))]
         public IActionResult SummaryPOST()
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = RetrieveUserId();
             var items = _unitOfWork.ShoppingCartRepository.GetAll(c => c.ApplicationUserId == userId, nameof(Product));
 
             ShoppingCartViewModel.ListedItems = items;

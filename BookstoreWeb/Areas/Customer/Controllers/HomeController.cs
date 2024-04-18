@@ -1,15 +1,15 @@
 using Bookstore.DataAccess.Repositories.Interfaces;
 using Bookstore.Models.Models;
 using Bookstore.Utility;
+using BookstoreWeb.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Security.Claims;
 
 namespace BookstoreWeb.Areas.Customer.Controllers
 {
     [Area("Customer")]
-    public class HomeController : Controller
+    public class HomeController : ControllerCustomBase
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IUnitOfWork _unitOfWork;
@@ -60,12 +60,9 @@ namespace BookstoreWeb.Areas.Customer.Controllers
         [Authorize] //we dont need to specify any role, the user just has to be logged in, no matter the role
         public IActionResult Details(ShoppingCart? cart)
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
-            cart.ApplicationUserId = userId;
+            cart.ApplicationUserId = RetrieveUserId();
 
-
-            var existingCartFromDb = _unitOfWork.ShoppingCartRepository.Get(c => c.ApplicationUserId == userId && c.ProductId == cart.ProductId);
+            var existingCartFromDb = _unitOfWork.ShoppingCartRepository.Get(c => c.ApplicationUserId == cart.ApplicationUserId && c.ProductId == cart.ProductId);
             if (existingCartFromDb != null)
             {
                 //user cart already existing for the product, so increment the count
@@ -78,11 +75,10 @@ namespace BookstoreWeb.Areas.Customer.Controllers
                 _unitOfWork.ShoppingCartRepository.Add(cart);
                 _unitOfWork.Save();
 
-                HttpContext.Session.SetInt32(ConstantDefines.Session_Cart, _unitOfWork.ShoppingCartRepository.GetAll(c => c.ApplicationUserId == userId).Count());
+                HttpContext.Session.SetInt32(ConstantDefines.Session_Cart, _unitOfWork.ShoppingCartRepository.GetAll(c => c.ApplicationUserId == cart.ApplicationUserId).Count());
             }
 
             TempData["success"] = "Cart updated successfully!";
-
 
             return RedirectToAction(nameof(Index));
         }

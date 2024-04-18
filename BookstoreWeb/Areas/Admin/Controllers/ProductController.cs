@@ -154,23 +154,23 @@ namespace BookstoreWeb.Areas.Admin.Controllers
         [HttpDelete]
         public IActionResult Delete(int? id)
         {
-            if(id == null) return Json(new { success = false, message = "Error! Product ID not valid!" });
+            if (id == null) return Json(new { success = false, message = "Error! Product ID not valid!" });
 
             Product? productToDelete = _unitOfWork.ProductRepository.Get(p => p.Id == id);
             if (productToDelete == null) return Json(new { success = false, message = "Error! Product not found in database!" });
 
             //delete the old image
-           
+
             if (!string.IsNullOrEmpty(productToDelete.ImageUrl))
             {
                 string oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToDelete.ImageUrl?.TrimStart('\\'));
-                
+
                 if (System.IO.File.Exists(oldImagePath))
                 {
                     System.IO.File.Delete(oldImagePath);
                 }
             }
-           
+
             _unitOfWork.ProductRepository.Remove(productToDelete);
             _unitOfWork.Save();
 
