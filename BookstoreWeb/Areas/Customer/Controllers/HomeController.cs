@@ -19,12 +19,6 @@ namespace BookstoreWeb.Areas.Customer.Controllers
         #region Index
         public IActionResult Index()
         {
-            var userId = RetrieveUserId();
-            if (!string.IsNullOrEmpty(userId))
-            {
-                HttpContext.Session.SetInt32(ConstantDefines.Session_Cart, _unitOfWork.ShoppingCartRepository.GetAll(c => c.ApplicationUserId == userId).Count());
-            }
-
             var productsFromDb = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category");
             return View(productsFromDb);
         }
