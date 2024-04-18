@@ -4,24 +4,27 @@ using Bookstore.Utility;
 using BookstoreWeb.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace BookstoreWeb.Areas.Customer.Controllers
 {
     [Area("Customer")]
     public class HomeController : ControllerCustomBase
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly IUnitOfWork _unitOfWork;
-        public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork)
+        public HomeController(IUnitOfWork unitOfWork)
         {
-            _logger = logger;
             _unitOfWork = unitOfWork;
         }
 
         #region Index
         public IActionResult Index()
         {
+            var userId = RetrieveUserId();
+            if (!string.IsNullOrEmpty(userId))
+            {
+                HttpContext.Session.SetInt32(ConstantDefines.Session_Cart, _unitOfWork.ShoppingCartRepository.GetAll(c => c.ApplicationUserId == userId).Count());
+            }
+
             var productsFromDb = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category");
             return View(productsFromDb);
         }
@@ -30,12 +33,6 @@ namespace BookstoreWeb.Areas.Customer.Controllers
         public IActionResult Privacy()
         {
             return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
         [HttpGet]

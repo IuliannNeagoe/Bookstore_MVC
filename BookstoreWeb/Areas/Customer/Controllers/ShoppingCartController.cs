@@ -57,11 +57,14 @@ namespace BookstoreWeb.Areas.Customer.Controllers
 
         public IActionResult Minus(int cartId)
         {
-            var cartFromDb = _unitOfWork.ShoppingCartRepository.Get(s => s.Id == cartId);
+            var cartFromDb = _unitOfWork.ShoppingCartRepository.Get(s => s.Id == cartId, tracked: true);
             if (cartFromDb == null) return NotFound();
 
             if (cartFromDb.Count <= 1)
             {
+                HttpContext.Session.SetInt32(ConstantDefines.Session_Cart,
+                    _unitOfWork.ShoppingCartRepository.GetAll(c => c.ApplicationUserId == cartFromDb.ApplicationUserId).Count() - 1);
+
                 //remove from cart
                 _unitOfWork.ShoppingCartRepository.Remove(cartFromDb);
             }
@@ -77,10 +80,16 @@ namespace BookstoreWeb.Areas.Customer.Controllers
 
         public IActionResult Remove(int cartId)
         {
-            var cartFromDb = _unitOfWork.ShoppingCartRepository.Get(s => s.Id == cartId);
+            //tracked has to be true, because we are retrieving the cart once here, then once for the Session, and EF throws a conflict ( I think :/ )
+            var cartFromDb = _unitOfWork.ShoppingCartRepository.Get(s => s.Id == cartId, tracked: true);
             if (cartFromDb == null) return NotFound();
+
+            HttpContext.Session.SetInt32(ConstantDefines.Session_Cart,
+                _unitOfWork.ShoppingCartRepository.GetAll(c => c.ApplicationUserId == cartFromDb.ApplicationUserId).Count() - 1);
+
             _unitOfWork.ShoppingCartRepository.Remove(cartFromDb);
             _unitOfWork.Save();
+
             return RedirectToAction(nameof(Index));
         }
 
