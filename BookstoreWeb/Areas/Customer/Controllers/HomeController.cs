@@ -1,5 +1,6 @@
 using Bookstore.DataAccess.Repositories.Interfaces;
 using Bookstore.Models.Models;
+using Bookstore.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -70,14 +71,18 @@ namespace BookstoreWeb.Areas.Customer.Controllers
                 //user cart already existing for the product, so increment the count
                 existingCartFromDb.Count += cart.Count;
                 _unitOfWork.ShoppingCartRepository.Update(existingCartFromDb);
+                _unitOfWork.Save();
             }
             else
             {
                 _unitOfWork.ShoppingCartRepository.Add(cart);
+                _unitOfWork.Save();
+
+                HttpContext.Session.SetInt32(ConstantDefines.Session_Cart, _unitOfWork.ShoppingCartRepository.GetAll(c => c.ApplicationUserId == userId).Count());
             }
 
             TempData["success"] = "Cart updated successfully!";
-            _unitOfWork.Save();
+
 
             return RedirectToAction(nameof(Index));
         }

@@ -8,6 +8,8 @@
         public const string Role_Employee = "Employee";
         public const string DOMAIN = "https://localhost:7044";
 
+        public const string Session_Cart = "SessionShoppingCart";
+
     }
 
     public enum OrderStatus { Pending, Approved, Processing, Shipped, Cancelled }
