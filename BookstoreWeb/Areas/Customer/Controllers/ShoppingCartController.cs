@@ -233,8 +233,24 @@ namespace BookstoreWeb.Areas.Customer.Controllers
                     _unitOfWork.ShoppingCartRepository.RemoveRange(shoppingCarts);
 
                     _unitOfWork.Save();
+
+                    HttpContext.Session.Clear();
                 }
             }
+            else
+            {
+                //remove shoppingcart from db, because it was purchased
+                var shoppingCarts = _unitOfWork.ShoppingCartRepository
+                    .GetAll(s => s.ApplicationUserId == orderHeaderFromDb.ApplicationUserId).ToList();
+                _unitOfWork.ShoppingCartRepository.RemoveRange(shoppingCarts);
+
+                _unitOfWork.Save();
+
+                HttpContext.Session.Clear();
+            }
+
+
+
             return View(id);
         }
 

@@ -5,7 +5,14 @@
 <div class="card border-0 shadow mb-5">
     <div class="card-header bg-secondary bg-gradient p-4">
         <div class="row">
-            <h2 class="text-center text-light">Register</h2>
+            @if (User.IsInRole(ConstantDefines.Role_Admin))
+            {
+                <h2 class="text-center text-light">Register - ADMIN PORTAL</h2>
+            }
+            else
+            {
+                <h2 class="text-center text-light">Register</h2>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -71,23 +78,28 @@
                             <label asp-for="Input.PostalCode" class="ms-2">Postal Code</label>
                             <span asp-validation-for="Input.PostalCode" class="text-danger"></span>
                         </div>
-                        <div class=" mb-3 col-6  mb-3">
-                            <select asp-for="Input.Role" asp-items="@Model.Input.Roles" class="form-select p-3" aria-required="true">
-                                <option selected disabled>-- Select a role --</option>
-                            </select>
-                        </div>
+                        
+                        @if (User.IsInRole(ConstantDefines.Role_Admin))
+                        {
+                            <div class=" mb-3 col-6  mb-3">
+                                <select asp-for="Input.Role" asp-items="@Model.Input.Roles" class="form-select p-3" aria-required="true">
+                                    <option selected disabled>-- Select a role --</option>
+                                </select>
+                            </div>
+                        }
                     </div>
                   
-                    <div class="row">
+                    @if (User.IsInRole(ConstantDefines.Role_Admin))
+                    {
+                        <div class="row">
       
-                        <div class=" mb-3 col-6  mb-3">
-                            <select asp-for="Input.CompanyId" asp-items="@Model.Input.Companies" class="form-select p-3" aria-required="true" style="display:none">
-                                <option selected disabled>-- Select a company --</option>
-                            </select>
+                            <div class=" mb-3 col-6  mb-3">
+                                <select asp-for="Input.CompanyId" asp-items="@Model.Input.Companies" class="form-select p-3" aria-required="true" style="display:none">
+                                    <option selected disabled>-- Select a company --</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    
-                   
+                    }
                    
                     <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
                 </form>
