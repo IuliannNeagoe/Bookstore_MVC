@@ -120,15 +120,6 @@ namespace BookstoreWeb.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            //this is the same as await
-            if (!_roleManager.RoleExistsAsync(ConstantDefines.Role_Customer).GetAwaiter().GetResult())
-            {
-                await _roleManager.CreateAsync(new IdentityRole(ConstantDefines.Role_Admin));
-                await _roleManager.CreateAsync(new IdentityRole(ConstantDefines.Role_Employee));
-                await _roleManager.CreateAsync(new IdentityRole(ConstantDefines.Role_Customer));
-                await _roleManager.CreateAsync(new IdentityRole(ConstantDefines.Role_Company));
-            }
-
             Input = new()
             {
                 Roles = _roleManager.Roles.Select(r => new SelectListItem() { Text = r.Name, Value = r.Name }),

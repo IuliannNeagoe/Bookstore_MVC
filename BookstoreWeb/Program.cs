@@ -1,4 +1,5 @@
 using Bookstore.DataAccess.Data;
+using Bookstore.DataAccess.DbInitializer;
 using Bookstore.DataAccess.Repositories;
 using Bookstore.DataAccess.Repositories.Interfaces;
 using Bookstore.Utility;
@@ -43,6 +44,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //because of adding roles to the AddIdentity method, we need to add an implementation of EmailSender
 builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
 var app = builder.Build();
 
@@ -64,6 +66,9 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
+
+SeedDatabase();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
@@ -71,3 +76,13 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+
+void SeedDatabase()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        dbInitializer.Initialize();
+    }
+}
