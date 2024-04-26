@@ -6,7 +6,6 @@
         public const string Role_Customer = "Customer";
         public const string Role_Company = "Company";
         public const string Role_Employee = "Employee";
-        public const string DOMAIN = "https://localhost:7044";
 
         public const string Session_Cart = "SessionShoppingCart";
 

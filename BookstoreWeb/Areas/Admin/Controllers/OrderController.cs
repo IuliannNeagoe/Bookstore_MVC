@@ -153,10 +153,9 @@ namespace BookstoreWeb.Areas.Admin.Controllers
                     Quantity = item.Count
                 });
 
-
             Session session = StripeHelper.CreateStripeSession(lineOptions,
-                StringHelper.BuildUrl(nameof(Admin), "Order", nameof(PaymentConfirmation), OrderViewModel.OrderHeader.Id.ToString()),
-                StringHelper.BuildUrl(nameof(Admin), "Order", nameof(Details), OrderViewModel.OrderHeader.Id.ToString()));
+                StringHelper.BuildUrl(Domain, nameof(Admin), "Order", nameof(PaymentConfirmation), OrderViewModel.OrderHeader.Id.ToString()),
+                StringHelper.BuildUrl(Domain, nameof(Admin), "Order", nameof(Details), OrderViewModel.OrderHeader.Id.ToString()));
 
             _unitOfWork.OrderHeaderRepository.UpdateStripePaymentId(OrderViewModel.OrderHeader.Id, session.Id, session.PaymentIntentId);
             _unitOfWork.Save();

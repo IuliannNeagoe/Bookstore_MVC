@@ -2,26 +2,26 @@
 {
     public static class StringHelper
     {
-        public static string BuildUrl(string? area = null, string? controller = null, string? action = null, string? id = null)
+        public static string BuildUrl(string domain, string? area = null, string? controller = null, string? action = null, string? id = null)
         {
-            if (string.IsNullOrEmpty(area)) return ConstantDefines.DOMAIN;
+            if (string.IsNullOrEmpty(area)) return domain;
 
             if (string.IsNullOrEmpty(controller))
             {
-                return $"{ConstantDefines.DOMAIN}/{area}";
+                return $"{domain}/{area}";
             }
 
             if (string.IsNullOrEmpty(action))
             {
-                return $"{ConstantDefines.DOMAIN}/{area}/{controller}";
+                return $"{domain}/{area}/{controller}";
             }
 
             if (string.IsNullOrEmpty(id))
             {
-                return $"{ConstantDefines.DOMAIN}/{area}/{controller}/{action}";
+                return $"{domain}/{area}/{controller}/{action}";
             }
 
-            return $"{ConstantDefines.DOMAIN}/{area}/{controller}/{action}?id={id}";
+            return $"{domain}/{area}/{controller}/{action}?id={id}";
         }
     }
 }

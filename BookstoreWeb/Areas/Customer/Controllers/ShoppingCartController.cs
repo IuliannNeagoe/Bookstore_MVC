@@ -201,8 +201,8 @@ namespace BookstoreWeb.Areas.Customer.Controllers
 
 
             Session session = StripeHelper.CreateStripeSession(lineOptions,
-                StringHelper.BuildUrl("Customer", "ShoppingCart", nameof(OrderConfirmation), ShoppingCartViewModel.OrderHeader.Id.ToString()),
-                StringHelper.BuildUrl("Customer", "ShoppingCart", nameof(Index)));
+                StringHelper.BuildUrl(Domain, "Customer", "ShoppingCart", nameof(OrderConfirmation), ShoppingCartViewModel.OrderHeader.Id.ToString()),
+                StringHelper.BuildUrl(Domain, "Customer", "ShoppingCart", nameof(Index)));
 
             _unitOfWork.OrderHeaderRepository.UpdateStripePaymentId(ShoppingCartViewModel.OrderHeader.Id, session.Id, session.PaymentIntentId);
             _unitOfWork.Save();
