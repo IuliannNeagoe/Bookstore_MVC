@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bookstore.Models.Models
 {
-    public class ApplicationUser: IdentityUser
+    public class ApplicationUser : IdentityUser
     {
         [Required]
         public string? Name { get; set; }
@@ -19,5 +19,8 @@ namespace Bookstore.Models.Models
         [ForeignKey("CompanyId")]
         [ValidateNever]
         public Company Company { get; set; }
+
+        [NotMapped]
+        public string Role { get; set; }
     }
 }
