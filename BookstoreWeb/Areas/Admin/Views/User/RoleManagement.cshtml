@@ -1,0 +1,45 @@
+﻿@model RoleManagementViewModel
+
+<div class="card border-0 shadow mb-5">
+    <div class="card-header text-center text-light bg-secondary bg-gradient">
+        <h2>Manage User Role</h2>
+    </div>
+
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            <input asp-for="ApplicationUser.Id" hidden/>
+             <div class="row">
+                <div class="col-10">
+                    <div class="form-floating py-2">
+                        <input asp-for="ApplicationUser.Name" readonly class="form-control border-0 shadow"/>
+                        <label asp-for="ApplicationUser.Name"></label>
+                    </div>
+
+                    <div class="form-floating py-2">
+                        <select asp-for="ApplicationUser.Role" asp-items="@Model.RolesList" id="roleId" class="form-select p-3" aria-required="true" onchange="onRoleCheckboxChanged()">
+                        </select>
+                    </div>
+
+                    <div class="form-floating py-2">
+                        <select asp-for="ApplicationUser.CompanyId" asp-items="@Model.CompanyNamesList" id="companyId" class="form-select p-3" aria-required="true">
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="row py-2 d-flex justify-content-center">
+                <div class="col-6 col-md-3">
+                    <button type="submit" class="btn btn-primary form-control ">Update</button>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a asp-area="Admin" asp-controller="User" asp-action="Index" class="btn btn-outline-primary form-control border">Back to list</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/rolemanager.js"></script>
+}

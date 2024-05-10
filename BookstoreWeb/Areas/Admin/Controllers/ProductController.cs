@@ -91,7 +91,7 @@ namespace BookstoreWeb.Areas.Admin.Controllers
 
                 if (UploadImage(myFile, out string? fileName))
                 {
-                    productViewModel.Product.ImageUrl = @"\images\product\" + fileName;
+                    productViewModel.Product.ImageUrl = @"\images\" + fileName;
                 }
             }
 
@@ -181,7 +181,7 @@ namespace BookstoreWeb.Areas.Admin.Controllers
         #region Private methods
         private bool UploadImage(IFormFile myFile, out string? fileName)
         {
-            string productFolderPath = _webHostEnvironment.WebRootPath + @"\images\product";
+            string productFolderPath = _webHostEnvironment.WebRootPath + @"\images";
 
             try
             {

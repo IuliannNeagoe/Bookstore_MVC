@@ -24,7 +24,9 @@ function loadDataTable() {
                                <a onClick=BanUnban('${data.id}') class="btn btn-success text-white" style="cursor:pointer; width:100px;">
                                     <i class="bi bi-unlock-fill"></i> Unban
                                </a>
+                               <a href="/admin/user/rolemanagement?userId=${data.id}" class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Permissions </a>
                         </div>`
+                       
                     }
                     else {
                         return `
@@ -32,6 +34,7 @@ function loadDataTable() {
                                <a onClick=BanUnban('${data.id}') class="btn btn-danger text-white" style="cursor:pointer; width:100px;">
                                     <i class="bi bi-lock-fill"></i> Ban
                                </a>
+                               <a href="/admin/user/rolemanagement?userId=${data.id}" class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Permissions </a>
                         </div>`
                     }
                    
