@@ -19,7 +19,7 @@ namespace BookstoreWeb.Areas.Customer.Controllers
         #region Index
         public IActionResult Index()
         {
-            var productsFromDb = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category");
+            var productsFromDb = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category,ProductImages");
             return View(productsFromDb);
         }
         #endregion

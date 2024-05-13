@@ -10,7 +10,7 @@
             <input asp-for="Product.Id" hidden />
             @* ImageUrl - we need input fields in order to retrieve the info from the view, onto the POST request *@
             @* It does not matter that we have a file field for this property, it will not get populated without an explicit input field*@
-            <input asp-for="Product.ImageUrl" hidden />
+           @*  <input asp-for="Product.ImageUrl" hidden /> *@
             <div class="row">
                 <div class="col-10">
                     <div class="form-floating py-2">
@@ -73,13 +73,24 @@
                     </div>
 
                     <div class="form-floating py-2">
-                        <input type="file" name="myFile" asp-for="Product.ImageUrl" class="form-control border-0 shadow" />
-                        <label asp-for="Product.ImageUrl"></label>
+                        <input type="file" name="files" class="form-control border-0 shadow" multiple/>
+                        <label asp-for="Product.ProductImages"></label>
                     </div>
                 </div>
-                <div class="col-2">
-                    <img src="@Model.Product.ImageUrl" width="100%" style="border-radius:5px; border:1px solid #bbb9b9"/>
-                </div>
+                @if (Model.Product.ProductImages != null)
+                {
+                    <div class="col-2">
+                        @foreach (var image in Model.Product.ProductImages)
+                        {
+                            <div class="border p-1 m-2 text-center">
+                                <img src="@image.ImageUrl" width="100%" style="border-radius:5px; border:1px solid #bbb9b9"/>
+                                <a asp-action="DeleteImage" class="btn btn-danger" asp-route-imageId="@image.Id">
+                                   <i class="bi bi-trash-fill"></i> Delete
+                                </a>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
           
 

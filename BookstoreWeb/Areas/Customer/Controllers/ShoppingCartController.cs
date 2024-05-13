@@ -39,6 +39,8 @@ namespace BookstoreWeb.Areas.Customer.Controllers
             {
                 item.Price = MathHelper.GetPriceBasedOnQuantity(item);
                 ShoppingCartViewModel.OrderHeader.OrderTotal += item.Price * item.Count;
+                item.Product.ProductImages =
+                    _unitOfWork.ProductImageRepository.GetAll(u => u.ProductId == item.ProductId).ToList();
             }
 
             return View(ShoppingCartViewModel);

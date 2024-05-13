@@ -53,7 +53,7 @@ namespace BookstoreWeb.Areas.Admin.Controllers
             else
             {
                 //else we are updating an existing product
-                productViewModel.Product = _unitOfWork.ProductRepository.Get(p => p.Id == myId);
+                productViewModel.Product = _unitOfWork.ProductRepository.Get(p => p.Id == myId, includeProperties: "ProductImages");
             }
 
             productViewModel.CategoryList = categoryList;
@@ -62,7 +62,7 @@ namespace BookstoreWeb.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Upsert(ProductViewModel productViewModel, IFormFile? myFile)
+        public IActionResult Upsert(ProductViewModel productViewModel, List<IFormFile?> files)
         {
             if (!ModelState.IsValid)
             {
@@ -77,36 +77,28 @@ namespace BookstoreWeb.Areas.Admin.Controllers
                 return View(productViewModel);
             }
 
-            if (myFile != null)
-            {
-                //first check if a file is already uploaded, in that case we need to delete the old one
-                if (!string.IsNullOrEmpty(productViewModel.Product.ImageUrl))
-                {
-                    var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productViewModel.Product.ImageUrl.TrimStart('\\'));
-                    if (System.IO.File.Exists(oldImagePath))
-                    {
-                        System.IO.File.Delete(oldImagePath);
-                    }
-                }
-
-                if (UploadImage(myFile, out string? fileName))
-                {
-                    productViewModel.Product.ImageUrl = @"\images\" + fileName;
-                }
-            }
-
-
             if (productViewModel.Product.Id == 0)
             {
                 _unitOfWork.ProductRepository.Add(productViewModel.Product);
             }
-            else
-            {
-                _unitOfWork.ProductRepository.Update(productViewModel.Product);
-            }
 
             _unitOfWork.Save();
-            TempData["success"] = "Product created successfully!";
+
+
+            if (files != null)
+            {
+
+                foreach (IFormFile file in files)
+                {
+                    UploadImage(file, productViewModel);
+                }
+
+                _unitOfWork.ProductRepository.Update(productViewModel.Product);
+                _unitOfWork.Save();
+            }
+
+
+            TempData["success"] = "Product created/Updated successfully!";
             return RedirectToAction("Index", "Product");
         }
 
@@ -114,6 +106,7 @@ namespace BookstoreWeb.Areas.Admin.Controllers
         #endregion
 
         #region Delete
+
         /// <summary>
         /// obsolete
         /// </summary>
@@ -140,6 +133,19 @@ namespace BookstoreWeb.Areas.Admin.Controllers
         //    return RedirectToAction("Index");
         //}
 
+        public IActionResult DeleteImage(int imageId)
+        {
+            var imageFromDb = _unitOfWork.ProductImageRepository.Get(u => u.Id == imageId, includeProperties: "Product");
+            if (imageFromDb != null)
+            {
+                RemoveImage(imageFromDb.ImageUrl);
+
+                _unitOfWork.ProductImageRepository.Remove(imageFromDb);
+                _unitOfWork.Save();
+            }
+
+            return RedirectToAction(nameof(Upsert), new { myId = imageFromDb.Product.Id });
+        }
         #endregion
 
         #region API Calls
@@ -159,19 +165,17 @@ namespace BookstoreWeb.Areas.Admin.Controllers
             Product? productToDelete = _unitOfWork.ProductRepository.Get(p => p.Id == id);
             if (productToDelete == null) return Json(new { success = false, message = "Error! Product not found in database!" });
 
-            //delete the old image
+            _unitOfWork.ProductRepository.Remove(productToDelete);
 
-            if (!string.IsNullOrEmpty(productToDelete.ImageUrl))
+            //remove any images of the product as well
+
+            var productImages = _unitOfWork.ProductImageRepository.GetAll(u => u.ProductId == id);
+            foreach (var image in productImages)
             {
-                string oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToDelete.ImageUrl?.TrimStart('\\'));
-
-                if (System.IO.File.Exists(oldImagePath))
-                {
-                    System.IO.File.Delete(oldImagePath);
-                }
+                _unitOfWork.ProductImageRepository.Remove(image);
+                RemoveImage(image.ImageUrl);
             }
 
-            _unitOfWork.ProductRepository.Remove(productToDelete);
             _unitOfWork.Save();
 
             return Json(new { success = true, message = "Product deleted successfully!" });
@@ -179,25 +183,49 @@ namespace BookstoreWeb.Areas.Admin.Controllers
         #endregion
 
         #region Private methods
-        private bool UploadImage(IFormFile myFile, out string? fileName)
+        private void UploadImage(IFormFile myFile, ProductViewModel productViewModel)
         {
-            string productFolderPath = _webHostEnvironment.WebRootPath + @"\images";
-
+            string individualProductPath = _webHostEnvironment.WebRootPath + @"\images\product-" + productViewModel.Product.Id;
             try
             {
-                fileName = Guid.NewGuid().ToString() + Path.GetExtension(myFile.FileName);
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(myFile.FileName);
 
-                using (var fileStream = new FileStream(Path.Combine(productFolderPath, fileName), FileMode.Create))
+                if (!Directory.Exists(individualProductPath))
+                    Directory.CreateDirectory(individualProductPath);
+
+                using (var fileStream = new FileStream(Path.Combine(individualProductPath, fileName), FileMode.Create))
                 {
                     myFile.CopyTo(fileStream);
                 }
 
-                return true;
+                productViewModel.Product.ProductImages ??= new List<ProductImage>();
+
+                ProductImage productImage = new()
+                {
+                    ImageUrl = @"\images\product-" + productViewModel.Product.Id + @"\" + fileName,
+                    ProductId = productViewModel.Product.Id
+                };
+
+                productViewModel.Product.ProductImages.Add(productImage);
+
+                //_unitOfWork.ProductImageRepository.Add(productImage);
             }
             catch (Exception)
             {
-                fileName = null;
-                return false;
+                return;
+            }
+        }
+
+        private void RemoveImage(string? imageUrl)
+        {
+            if (!string.IsNullOrEmpty(imageUrl))
+            {
+                string oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, imageUrl?.TrimStart('\\'));
+
+                if (System.IO.File.Exists(oldImagePath))
+                {
+                    System.IO.File.Delete(oldImagePath);
+                }
             }
         }
 

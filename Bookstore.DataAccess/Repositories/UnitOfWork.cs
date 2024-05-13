@@ -12,6 +12,7 @@ namespace Bookstore.DataAccess.Repositories
         private readonly IApplicationUserRepository _applicationUserRepository;
         private readonly IOrderHeaderRepository _orderHeaderRepository;
         private readonly IOrderDetailRepository _orderDetailRepository;
+        private readonly IProductImageRepository _productImageRepository;
         private readonly ApplicationDbContext _db;
 
         public ICategoryRepository CategoryRepository { get => _categoryRepository; }
@@ -21,6 +22,7 @@ namespace Bookstore.DataAccess.Repositories
         public IApplicationUserRepository ApplicationUserRepository { get => _applicationUserRepository; }
         public IOrderHeaderRepository OrderHeaderRepository { get => _orderHeaderRepository; }
         public IOrderDetailRepository OrderDetailRepository { get => _orderDetailRepository; }
+        public IProductImageRepository ProductImageRepository { get => _productImageRepository; }
 
         public UnitOfWork(ApplicationDbContext db)
         {
@@ -32,6 +34,7 @@ namespace Bookstore.DataAccess.Repositories
             _applicationUserRepository = new ApplicationUserRepository(_db);
             _orderHeaderRepository = new OrderHeaderRepository(_db);
             _orderDetailRepository = new OrderDetailRepository(_db);
+            _productImageRepository = new ProductImageRepository(_db);
         }
 
         public void Save()

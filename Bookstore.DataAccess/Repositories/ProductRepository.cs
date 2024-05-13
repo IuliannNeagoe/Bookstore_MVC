@@ -15,7 +15,7 @@ namespace Bookstore.DataAccess.Repositories
         public void Update(Product product)
         {
             var productFromDb = _db.Products.FirstOrDefault(p => p.Id == product.Id);
-            if(productFromDb != null)
+            if (productFromDb != null)
             {
                 productFromDb.Title = product.Title;
                 productFromDb.Description = product.Description;
@@ -26,11 +26,12 @@ namespace Bookstore.DataAccess.Repositories
                 productFromDb.ListPrice = product.ListPrice;
                 productFromDb.Author = product.Author;
                 productFromDb.ISBN = product.ISBN;
+                productFromDb.ProductImages = product.ProductImages;
 
-                if (!string.IsNullOrEmpty(product.ImageUrl))
-                {
-                    productFromDb.ImageUrl = product.ImageUrl;
-                }
+                //if (!string.IsNullOrEmpty(product.ImageUrl))
+                //{
+                //    productFromDb.ImageUrl = product.ImageUrl;
+                //}
             }
         }
     }

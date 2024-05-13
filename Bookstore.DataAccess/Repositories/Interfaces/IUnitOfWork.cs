@@ -9,6 +9,7 @@
         public IApplicationUserRepository ApplicationUserRepository { get; }
         public IOrderHeaderRepository OrderHeaderRepository { get; }
         public IOrderDetailRepository OrderDetailRepository { get; }
+        public IProductImageRepository ProductImageRepository { get; }
 
         public void Save();
     }
