@@ -36,7 +36,7 @@ namespace BookstoreWeb.Areas.Customer.Controllers
 
             ShoppingCart cart = new()
             {
-                Product = _unitOfWork.ProductRepository.Get(p => p.Id == myId, includeProperties: "Category"),
+                Product = _unitOfWork.ProductRepository.Get(p => p.Id == myId, includeProperties: "Category,ProductImages"),
                 Count = 1,
                 ProductId = myId.Value
             };

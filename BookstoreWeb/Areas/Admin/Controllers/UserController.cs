@@ -1,5 +1,4 @@
-﻿using Bookstore.DataAccess.Data;
-using Bookstore.DataAccess.Repositories.Interfaces;
+﻿using Bookstore.DataAccess.Repositories.Interfaces;
 using Bookstore.Models.ViewModels;
 using Bookstore.Utility;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +13,6 @@ namespace BookstoreWeb.Areas.Admin.Controllers
     public class UserController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ApplicationDbContext _db;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
 
@@ -22,12 +20,10 @@ namespace BookstoreWeb.Areas.Admin.Controllers
         public RoleManagementViewModel RoleManagementVM { get; set; }
 
         public UserController(IUnitOfWork unitOfWork,
-            ApplicationDbContext db,
             RoleManager<IdentityRole> roleManager,
             UserManager<IdentityUser> userManager)
         {
             _unitOfWork = unitOfWork;
-            _db = db;
             _roleManager = roleManager;
             _userManager = userManager;
         }
@@ -46,13 +42,11 @@ namespace BookstoreWeb.Areas.Admin.Controllers
         {
             var users = _unitOfWork.ApplicationUserRepository.GetAll(includeProperties: "Company");
 
-            var userRoles = _db.UserRoles.ToList();
-            var roles = _db.Roles.ToList();
 
             foreach (var user in users)
             {
-                var roleId = userRoles.FirstOrDefault(u => u.UserId == user.Id).RoleId;
-                user.Role = roles.FirstOrDefault(r => r.Id == roleId).Name;
+                var identityUser = user as IdentityUser;
+                user.Role = _userManager.GetRolesAsync(identityUser).GetAwaiter().GetResult().First();
             }
 
             return Json(new { data = users });
@@ -85,13 +79,16 @@ namespace BookstoreWeb.Areas.Admin.Controllers
         public IActionResult RoleManagement(string userId)
         {
             var userFromDb = _unitOfWork.ApplicationUserRepository.Get(u => u.Id == userId, includeProperties: "Company");
-            var userRoleId = _db.UserRoles.FirstOrDefault(u => u.UserId == userId).RoleId;
+
+            var identityUser = userFromDb as IdentityUser;
+
+            var userRole = _userManager.GetRolesAsync(identityUser).GetAwaiter().GetResult().First();
 
             RoleManagementVM = new RoleManagementViewModel()
             {
                 ApplicationUser = userFromDb,
                 CompanyNamesList = _unitOfWork.CompanyRepository.GetAll().Select(u => new SelectListItem() { Text = u.Name, Value = u.Id.ToString(), Selected = u.Id == userFromDb.Company?.Id }),
-                RolesList = _roleManager.Roles.Select(u => new SelectListItem() { Text = u.Name, Value = u.Id.ToString(), Selected = u.Name == _roleManager.Roles.FirstOrDefault(r => r.Id == userRoleId).Name })
+                RolesList = _roleManager.Roles.Select(u => new SelectListItem() { Text = u.Name, Value = u.Id.ToString(), Selected = u.Name == userRole })
             };
 
 
